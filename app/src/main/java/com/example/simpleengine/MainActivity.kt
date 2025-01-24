@@ -32,6 +32,13 @@ import androidx.compose.ui.unit.dp
 import com.example.simpleengine.candybar.CandyBarDecision
 import com.example.simpleengine.candybar.triggers.TriggerEvent
 
+// TODO: State management on a per-campaign basis (clearing state if the campaign changes)
+// TODO: Delay of enacting the candybar
+
+//  What do we have so far:
+//  - easily extensible
+//  - easy to test
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
