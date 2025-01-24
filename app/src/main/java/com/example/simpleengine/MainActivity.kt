@@ -9,12 +9,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -26,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -63,12 +63,13 @@ fun AppScreen() {
     var isMediaPlaying by remember { mutableStateOf(false) }
     var currentScreen by remember { mutableStateOf(screenOne) }
     val lastEvent: TriggerEvent? by eventStore.observeEvents().collectAsState(null)
+    var campaign by remember { mutableStateOf(campaign) }
 
     var inputNumber by remember { mutableStateOf("0") }
 
     val candyBarDecision: CandyBarDecision by candyBarManager.state.collectAsState(
         CandyBarDecision(
-            false, campaign
+            false, com.example.simpleengine.campaign
         )
     )
 
@@ -81,7 +82,8 @@ fun AppScreen() {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
     ) {
         Container {
             Text(
@@ -184,6 +186,23 @@ fun AppScreen() {
             }
         }
 
+        Container {
+            Text(
+                text = "Campaign",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Button(onClick = {
+                    campaign = if (campaign == campaignOne) campaignTwo else campaignOne
+                }) {
+                    Text(text = if (campaign == campaignOne) "Campaign1" else "campaign2")
+                }
+            }
+        }
+
         Spacer(modifier = Modifier.weight(1F))
 
         Column(
@@ -233,6 +252,7 @@ fun Result(result: CandyBarDecision) {
             text = result.show.toString(),
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
+            color = if (result.show) Color.Green else Color.Red
         )
     }
 }
