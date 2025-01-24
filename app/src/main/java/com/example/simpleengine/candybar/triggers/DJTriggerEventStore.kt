@@ -4,7 +4,6 @@ import com.example.simpleengine.scope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 // singleton implementation that implements each of the interfaces
@@ -19,7 +18,7 @@ class DJTriggerEventStore {
         }
     }
 
-    fun observeEvents(): Flow<TriggerEvent> = state.filterNotNull()
+    fun observeEvents(): Flow<TriggerEvent?> = state
 
     fun clearEvents() {
         scope.launch { _state.emit(null) }

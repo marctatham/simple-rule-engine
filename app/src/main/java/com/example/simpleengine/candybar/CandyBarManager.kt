@@ -1,25 +1,19 @@
 package com.example.simpleengine.candybar
 
-import androidx.compose.material3.contentColorFor
+import android.util.Log
 import com.example.simpleengine.candybar.media.MediaStateStore
 import com.example.simpleengine.candybar.modals.ModalStateStore
 import com.example.simpleengine.candybar.screen.ScreenStateStore
 import com.example.simpleengine.candybar.triggers.DJTriggerEventStore
 import com.example.simpleengine.candybar.triggers.TriggerEvent
-import com.example.simpleengine.experimentation.CandyBarConfig
 import com.example.simpleengine.experimentation.Feature
 import com.example.simpleengine.experimentation.FeatureFlagRepository
-import com.example.simpleengine.experimentation.MockFeatureFlagRepository
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlin.experimental.ExperimentalTypeInference
 
 class CandyBarManager(
     private val candyBarRuleEngine: CandyBarRuleEngine,
@@ -43,7 +37,7 @@ class CandyBarManager(
         val screenFlow: Flow<String> = screenStore.observeEvents()
         val mediaFlow: Flow<Boolean> = mediaStore.observeEvents()
         val modalFlow: Flow<Boolean> = modalStore.observeEvents()
-        val eventsFlow: Flow<TriggerEvent> = eventStore.observeEvents()
+        val eventsFlow: Flow<TriggerEvent?> = eventStore.observeEvents()
 
         val combinedFlow = combine(
             screenFlow,
@@ -51,6 +45,7 @@ class CandyBarManager(
             modalFlow,
             eventsFlow
         ) { screen, media, modal, event ->
+            Log.w("CandyBarManager", "screen: $screen, media: $media, modal: $modal, event: $event")
             val decision = candyBarRuleEngine.evaluate(
                 config = currentConfig,
                 event = event,
