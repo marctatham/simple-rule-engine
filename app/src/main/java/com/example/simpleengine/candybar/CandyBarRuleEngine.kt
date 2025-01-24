@@ -1,6 +1,6 @@
 package com.example.simpleengine.candybar
 
-import com.example.simpleengine.candybar.triggers.TriggerEvent
+import com.example.simpleengine.candybar.triggers.CandyBarRule
 import com.example.simpleengine.experimentation.CandyBarConfig
 
 // must be stateless
@@ -13,7 +13,8 @@ class CandyBarRuleEngine {
 
     fun evaluate(
         config: CandyBarConfig,
-        events: List<TriggerEvent>, // note: can be nullable if no event has taken place yet!
+        rules: List<String>,
+        events: List<CandyBarRule>,
         currentScreen: String,
         isMediaPlaying: Boolean,
         isModalVisible: Boolean,
@@ -31,20 +32,14 @@ class CandyBarRuleEngine {
             return declined
         }
 
-        // Rule: if the config contains a triggerAppVisits of greater than 0, it must be evaluated
-        val eventVisits = events.find { it is TriggerEvent.AppVisitEvent } as? TriggerEvent.AppVisitEvent
-        val triggerVisits = evaluateAppVisitTrigger(config, eventVisits)
+        // How to check if all conditions are meet with full List?
+        val show = events.all { it.conditionsMeet } && rules.all { it -> it in events.map { it.key } }
 
-
-        val eventDuration = events.find { it is TriggerEvent.AppVisitTimeEvent } as? TriggerEvent.AppVisitTimeEvent
-        val triggerDuration = evaluateDurationTrigger(config, eventDuration)
-
-
-        val show = triggerVisits && triggerDuration
         return CandyBarDecision(show = show)
     }
 }
 
+/*
 private fun evaluateAppVisitTrigger(
     config: CandyBarConfig,
     event: TriggerEvent.AppVisitEvent?
@@ -71,3 +66,4 @@ private fun evaluateDurationTrigger(
 
     return false
 }
+*/

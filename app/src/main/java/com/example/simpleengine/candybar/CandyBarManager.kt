@@ -4,8 +4,8 @@ import android.util.Log
 import com.example.simpleengine.candybar.media.MediaStateStore
 import com.example.simpleengine.candybar.modals.ModalStateStore
 import com.example.simpleengine.candybar.screen.ScreenStateStore
+import com.example.simpleengine.candybar.triggers.CandyBarRule
 import com.example.simpleengine.candybar.triggers.DJTriggerEventStore
-import com.example.simpleengine.candybar.triggers.TriggerEvent
 import com.example.simpleengine.experimentation.Feature
 import com.example.simpleengine.experimentation.FeatureFlagRepository
 import kotlinx.coroutines.CoroutineScope
@@ -46,7 +46,13 @@ class CandyBarManager(
         val screenFlow: Flow<String> = screenStore.observeEvents()
         val mediaFlow: Flow<Boolean> = mediaStore.observeEvents()
         val modalFlow: Flow<Boolean> = modalStore.observeEvents()
-        val eventsFlow: Flow<List<TriggerEvent>> = eventStore.observeEvents()
+        val eventsFlow: Flow<List<CandyBarRule>> = eventStore.observeEvents()
+
+        // TODO: Think about how to get the list of rules
+        val allRulesOfCampaign = listOf(
+            "app_visit",
+            "app_visit_time"
+        )
 
         combine(
             screenFlow,
@@ -59,6 +65,7 @@ class CandyBarManager(
                 events = event,
                 currentScreen = screen,
                 isMediaPlaying = media,
+                rules = allRulesOfCampaign,
                 isModalVisible = modal
             )
         }.flatMapLatest { decision -> // flatMapLatest: Cancel the previous flow and start a new one

@@ -32,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.simpleengine.candybar.CandyBarDecision
+import com.example.simpleengine.candybar.triggers.CandyBarRule
 import com.example.simpleengine.candybar.triggers.TriggerEvent
 import com.example.simpleengine.ui.Container
 import com.example.simpleengine.ui.Header
@@ -216,7 +217,7 @@ fun AppScreen() {
             Stat("Modals:", "$isModalVisible")
             Stat("Media:", "$isMediaPlaying")
             Stat("Screen:", currentScreen)
-            Stat("Events:", "${events.map { it.toDisplayName() }}")
+            Stat("Events:", "${events.map { it.toDisplayName() +"\n"}}")
 
             Result(candyBarDecision)
         }
@@ -261,10 +262,9 @@ fun AppScreenPreview() {
     AppScreen()
 }
 
-fun TriggerEvent.toDisplayName(): String {
+fun CandyBarRule.toDisplayName(): String {
     return when (this) {
-        is TriggerEvent.AppVisitEvent -> "App Visit: ${this.visitCount}"
-        is TriggerEvent.AppVisitTimeEvent -> "App Duration: ${this.durationInMinutes}"
-        else -> "none"
+        is CandyBarRule.AppVisitRule -> "App Visit: ${this.value} - Condition: ${this.conditionsMeet}"
+        is CandyBarRule.AppVisitTimeRule -> "App Duration: ${this.value} - Condition: ${this.conditionsMeet}"
     }
 }
