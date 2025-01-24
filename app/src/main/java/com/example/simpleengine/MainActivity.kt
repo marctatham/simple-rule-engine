@@ -46,21 +46,26 @@ class MainActivity : ComponentActivity() {
             AppScreen()
         }
     }
-
-
 }
+
+
+const val screenOne = "ScreenOne"
+const val screenTwo = "ScreenTwo"
+const val screenThree = "ScreenThree"
+const val screenFour = "ScreenFour"
 
 @Composable
 fun AppScreen() {
 
 
     var isModalVisible by remember { mutableStateOf(false) }
-    var isVideoOn by remember { mutableStateOf(false) }
-    var currentScreen by remember { mutableStateOf("Home") }
-    var lastEvent by remember { mutableStateOf("No Event") }
+    var isMediaPlaying by remember { mutableStateOf(false) }
+    var currentScreen by remember { mutableStateOf(screenOne) }
+    val lastEvent: TriggerEvent? by eventStore.observeEvents().collectAsState(null)
+
     var inputNumber by remember { mutableStateOf("0") }
 
-    val candyBarDecision = candyBarManager.state.collectAsState(CandyBarDecision(false))
+    val candyBarDecision: CandyBarDecision by candyBarManager.state.collectAsState(CandyBarDecision(false))
 
     val screenChangeHandler: (String) -> Unit = {
         currentScreen = it
@@ -92,10 +97,10 @@ fun AppScreen() {
                 }
 
                 Button(onClick = {
-                    isVideoOn = !isVideoOn
-                    mediaTracker.track(isVideoOn)
+                    isMediaPlaying = !isMediaPlaying
+                    mediaTracker.track(isMediaPlaying)
                 }) {
-                    Text(text = if (isVideoOn) "Video ON" else "Video OFF")
+                    Text(text = if (isMediaPlaying) "Video ON" else "Video OFF")
                 }
             }
 
@@ -110,15 +115,12 @@ fun AppScreen() {
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Button(onClick = {
-                    lastEvent = "app_visit: $inputNumber"
-
                     eventTracker.track(TriggerEvent.AppVisitEvent(inputNumber.toInt()))
                 }) {
                     Text(textAlign = TextAlign.Center, text = "Trigger\napp_visit")
                 }
 
                 Button(onClick = {
-                    lastEvent = "scroll_articles: $inputNumber"
                     eventTracker.track(TriggerEvent.AppVisitTimeEvent(inputNumber.toInt()))
                 }) {
                     Text(textAlign = TextAlign.Center, text = "Trigger\nscroll_articles")
@@ -149,56 +151,86 @@ fun AppScreen() {
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Button(onClick = {
-                    val screen = "ScreenOne"
+                    val screen = screenOne
                     screenChangeHandler(screen)
                 }) {
-                    Text(text = "ScreenOne")
+                    Text(text = screenOne)
                 }
                 Button(onClick = {
-                    val screen = "ScreenTwo"
+                    val screen = screenTwo
                     screenChangeHandler(screen)
                 }) {
-                    Text(text = "ScreenTwo")
+                    Text(text = screenTwo)
                 }
             }
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Button(onClick = {
-                    val screen = "ScreenThree"
+                    val screen = screenThree
                     screenChangeHandler(screen)
                 }) {
-                    Text(text = "ScreenThree")
+                    Text(text = screenThree)
                 }
                 Button(onClick = {
-                    val screen = "ScreenFour"
+                    val screen = screenFour
                     screenChangeHandler(screen)
                 }) {
-                    Text(text = "ScreenFour")
+                    Text(text = screenFour)
                 }
             }
         }
 
+
         Column(
-            modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.fillMaxWidth(0.5F),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "CandyBar Decision: ${candyBarDecision.value.show}",
+                text = "Key Metrics:",
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold
             )
+            Stat("Modals:", "$isModalVisible")
+            Stat("Media:", "$isMediaPlaying")
+            Stat("Screen:", currentScreen)
+            Stat("Event:", "${lastEvent?.toDisplayName()}")
 
-            Text(
-                text = "Last Event: $lastEvent",
-                style = MaterialTheme.typography.bodyLarge,
-            )
-
-            Text(
-                text = "Current Screen: $currentScreen",
-                style = MaterialTheme.typography.bodyLarge,
-            )
+            Result(candyBarDecision)
         }
 
+    }
+}
+
+@Composable
+fun Stat(title: String, value: String) {
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.weight(1F)
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyLarge,
+        )
+    }
+}
+
+@Composable
+fun Result(result: CandyBarDecision) {
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = "Show CandyBar:",
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.weight(1F)
+        )
+        Text(
+            text = result.show.toString(),
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold,
+        )
     }
 }
 
@@ -206,4 +238,12 @@ fun AppScreen() {
 @Composable
 fun AppScreenPreview() {
     AppScreen()
+}
+
+fun TriggerEvent?.toDisplayName():String {
+    return when (this) {
+        is TriggerEvent.AppVisitEvent -> "App Visit: ${this.visitCount}"
+        is TriggerEvent.AppVisitTimeEvent -> "App Duration: ${this.durationInMinutes}"
+        else -> "none"
+    }
 }
