@@ -50,8 +50,8 @@ class CandyBarManager(
                 config = currentConfig,
                 event = event,
                 currentScreen = screen,
-                isMediaPlaying = true,
-                isModalVisible = true
+                isMediaPlaying = media,
+                isModalVisible = modal
             )
             _state.emit(decision)
         }.launchIn(scope)
