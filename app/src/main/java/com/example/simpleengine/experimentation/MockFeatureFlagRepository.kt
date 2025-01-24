@@ -10,10 +10,10 @@ class MockFeatureFlagRepository : FeatureFlagRepository {
             variationKey = "variationKey",
             title = "title",
             description = "description",
-            triggerAppVisits = 1,
-            triggerAppVisitsTime = 1,
+            triggerAppVisits = 2,
+            triggerAppVisitDurationInMinutes = 3,
             coolOffPeriodInDays = 1,
-            popUpDelayInMilliseconds = 1
+            popUpDelayInMilliseconds = 3
         ) as T
     }
 }

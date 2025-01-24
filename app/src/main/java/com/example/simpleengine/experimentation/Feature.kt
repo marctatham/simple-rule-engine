@@ -14,7 +14,7 @@ data class CandyBarConfig(
 
     // whatever triggers as well
     val triggerAppVisits: Int,
-    val triggerAppVisitsTime: Int,
+    val triggerAppVisitDurationInMinutes: Int,
 
     // rules information
     val coolOffPeriodInDays: Int, // = 3 days

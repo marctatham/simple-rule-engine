@@ -1,4 +1,4 @@
-package com.example.simpleengine.candybar
+package com.example.simpleengine.candybar.triggers
 
 interface TriggerEventTracker {
 

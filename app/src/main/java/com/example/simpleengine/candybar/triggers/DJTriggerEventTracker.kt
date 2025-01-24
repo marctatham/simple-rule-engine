@@ -1,9 +1,7 @@
-package com.example.simpleengine.candybar
-
-import com.dowjones.candybar.WritableTriggerEventStore
+package com.example.simpleengine.candybar.triggers
 
 class DJTriggerEventTracker(
-    private val triggerEventStore: WritableTriggerEventStore
+    private val triggerEventStore: DJTriggerEventStore
 ) : TriggerEventTracker {
 
     override fun track(triggerEvent: TriggerEvent) {
