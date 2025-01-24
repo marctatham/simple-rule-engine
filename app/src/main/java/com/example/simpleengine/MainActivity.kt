@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import com.example.simpleengine.candybar.CandyBarDecision
 import com.example.simpleengine.candybar.triggers.TriggerEvent
 import com.example.simpleengine.ui.Container
+import com.example.simpleengine.ui.Header
 
 // TODO: State management on a per-campaign basis (clearing state if the campaign changes)
 // TODO: Delay of enacting the candybar
@@ -86,11 +87,7 @@ fun AppScreen() {
             .verticalScroll(rememberScrollState()),
     ) {
         Container {
-            Text(
-                text = "Universal Rules",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
+            Header("Universal Rules")
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
             ) {
@@ -111,11 +108,7 @@ fun AppScreen() {
         }
 
         Container {
-            Text(
-                text = "Events",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
+            Header("Events")
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
             ) {
@@ -147,11 +140,7 @@ fun AppScreen() {
         }
 
         Container {
-            Text(
-                text = "Navigation",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
+            Header("Navigation")
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
             ) {
@@ -187,11 +176,7 @@ fun AppScreen() {
         }
 
         Container {
-            Text(
-                text = "Campaign",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
+            Header("Campaign")
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
             ) {
