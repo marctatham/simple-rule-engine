@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class CandyBarManager(
     private val candyBarRuleEngine: CandyBarRuleEngine,
@@ -28,7 +29,9 @@ class CandyBarManager(
     private var currentConfig = featureFlagRepo.getFeatureConfiguration(Feature.CandyBar)
 
     private val _state = MutableStateFlow(CandyBarDecision(show = false))
-    val state: Flow<CandyBarDecision> = _state.asStateFlow()
+    val state: Flow<CandyBarDecision> = _state.asStateFlow().onEach {
+        Log.i("CandyBarManager", "CandyBarDecision: ${it.show}")
+    }
 
     init {
         // observe things that I care about:
@@ -39,14 +42,13 @@ class CandyBarManager(
         val modalFlow: Flow<Boolean> = modalStore.observeEvents()
         val eventsFlow: Flow<TriggerEvent?> = eventStore.observeEvents()
 
-        val combinedFlow = combine(
+        combine(
             screenFlow,
             mediaFlow,
             modalFlow,
             eventsFlow
         ) { screen, media, modal, event ->
-            Log.w("CandyBarManager", "screen: $screen, media: $media, modal: $modal, event: $event")
-            val decision = candyBarRuleEngine.evaluate(
+            val decision: CandyBarDecision = candyBarRuleEngine.evaluate(
                 config = currentConfig,
                 event = event,
                 currentScreen = screen,
