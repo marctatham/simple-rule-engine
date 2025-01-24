@@ -13,7 +13,7 @@ class MockFeatureFlagRepository : FeatureFlagRepository {
             triggerAppVisits = 2,
             triggerAppVisitDurationInMinutes = 3,
             coolOffPeriodInDays = 1,
-            popUpDelayInMilliseconds = 3
+            popUpDelayInMilliseconds = 3000
         ) as T
     }
 }
