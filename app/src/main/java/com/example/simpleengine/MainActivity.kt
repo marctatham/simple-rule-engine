@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -31,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.simpleengine.candybar.CandyBarDecision
 import com.example.simpleengine.candybar.triggers.TriggerEvent
+import com.example.simpleengine.ui.Container
 
 // TODO: State management on a per-campaign basis (clearing state if the campaign changes)
 // TODO: Delay of enacting the candybar
@@ -56,8 +59,6 @@ const val screenFour = "ScreenFour"
 
 @Composable
 fun AppScreen() {
-
-
     var isModalVisible by remember { mutableStateOf(false) }
     var isMediaPlaying by remember { mutableStateOf(false) }
     var currentScreen by remember { mutableStateOf(screenOne) }
@@ -65,7 +66,11 @@ fun AppScreen() {
 
     var inputNumber by remember { mutableStateOf("0") }
 
-    val candyBarDecision: CandyBarDecision by candyBarManager.state.collectAsState(CandyBarDecision(false, campaign))
+    val candyBarDecision: CandyBarDecision by candyBarManager.state.collectAsState(
+        CandyBarDecision(
+            false, campaign
+        )
+    )
 
     val screenChangeHandler: (String) -> Unit = {
         currentScreen = it
@@ -73,14 +78,12 @@ fun AppScreen() {
     }
 
     Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        verticalArrangement = Arrangement.SpaceBetween,
-        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Container {
             Text(
                 text = "Universal Rules",
                 style = MaterialTheme.typography.titleLarge,
@@ -103,9 +106,9 @@ fun AppScreen() {
                     Text(text = if (isMediaPlaying) "Video ON" else "Video OFF")
                 }
             }
+        }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
+        Container {
             Text(
                 text = "Events",
                 style = MaterialTheme.typography.titleLarge,
@@ -139,9 +142,9 @@ fun AppScreen() {
                     .fillMaxWidth()
                     .padding(bottom = 16.dp)
             )
+        }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
+        Container {
             Text(
                 text = "Navigation",
                 style = MaterialTheme.typography.titleLarge,
@@ -181,6 +184,7 @@ fun AppScreen() {
             }
         }
 
+        Spacer(modifier = Modifier.weight(1F))
 
         Column(
             modifier = Modifier.fillMaxWidth(0.5F),
@@ -207,9 +211,7 @@ fun AppScreen() {
 fun Stat(title: String, value: String) {
     Row(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = title,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.weight(1F)
+            text = title, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1F)
         )
         Text(
             text = value,
@@ -241,7 +243,7 @@ fun AppScreenPreview() {
     AppScreen()
 }
 
-fun TriggerEvent?.toDisplayName():String {
+fun TriggerEvent?.toDisplayName(): String {
     return when (this) {
         is TriggerEvent.AppVisitEvent -> "App Visit: ${this.visitCount}"
         is TriggerEvent.AppVisitTimeEvent -> "App Duration: ${this.durationInMinutes}"
