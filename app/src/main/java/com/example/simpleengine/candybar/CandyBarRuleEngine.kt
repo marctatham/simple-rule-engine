@@ -7,11 +7,9 @@ import com.example.simpleengine.experimentation.CandyBarConfig
 // why? because we must be able to unit test this heavily
 // a lot of thought will go into exactly the scenarios we care about covering
 
-const val NO_SHOW = "ScreenOne"
+val NO_SHOW_PAGES = listOf("ScreenOne")
 
 class CandyBarRuleEngine {
-
-    private val declined = CandyBarDecision(show = false)
 
     fun evaluate(
         config: CandyBarConfig,
@@ -24,8 +22,9 @@ class CandyBarRuleEngine {
     ): CandyBarDecision {
 
         // let's do the easy part, short-circuit for any deal-breaker scenarios
+        val declined = CandyBarDecision(show = false, config = config)
         if (!config.isEnabled
-            || currentScreen == NO_SHOW
+            || NO_SHOW_PAGES.contains(currentScreen)
             || isMediaPlaying
             || isModalVisible
         ) {
@@ -37,7 +36,7 @@ class CandyBarRuleEngine {
             && event is TriggerEvent.AppVisitEvent
             && event.visitCount >= config.triggerAppVisits
         ) {
-            return CandyBarDecision(show = true)
+            return CandyBarDecision(show = true, config = config)
         }
 
         // Rule: if the config contains a triggerAppVisits of greater than 0, it must be evaluated
@@ -45,14 +44,9 @@ class CandyBarRuleEngine {
             && event is TriggerEvent.AppVisitTimeEvent
             && event.durationInMinutes >= config.triggerAppVisitDurationInMinutes
         ) {
-            return CandyBarDecision(show = true)
+            return CandyBarDecision(show = true, config = config)
         }
 
         return declined
     }
 }
-
-
-// TODO: find a better name for this
-// define what this looks like
-data class CandyBarDecision(val show: Boolean)

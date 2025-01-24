@@ -11,6 +11,7 @@ import com.example.simpleengine.candybar.screen.ScreenStateStore
 import com.example.simpleengine.candybar.screen.ScreenTracker
 import com.example.simpleengine.candybar.triggers.DJTriggerEventStore
 import com.example.simpleengine.candybar.triggers.DJTriggerEventTracker
+import com.example.simpleengine.experimentation.CandyBarConfig
 import com.example.simpleengine.experimentation.MockFeatureFlagRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +20,31 @@ import kotlinx.coroutines.Dispatchers
 // this will do for this hack project
 
 val scope = CoroutineScope(Dispatchers.Default)
+
+// campaigns
+
+val campaignOne = CandyBarConfig(
+    isEnabled = true,
+    variationKey = "marketing1",
+    title = "campaign1",
+    description = "leDescription1",
+    triggerAppVisits = 1,
+    triggerAppVisitDurationInMinutes = 0,
+    coolOffPeriodInDays = 3,
+    popUpDelayInMilliseconds = 3000
+)
+
+val campaignTwo = CandyBarConfig(
+    isEnabled = true,
+    variationKey = "marketing2",
+    title = "campaign2",
+    description = "leDescription2",
+    triggerAppVisits = 0,
+    triggerAppVisitDurationInMinutes = 2,
+    coolOffPeriodInDays = 3,
+    popUpDelayInMilliseconds = 3000
+)
+var campaign = campaignOne
 
 val mediaStore: MediaStateStore = MediaStateStore()
 val modalStore = ModalStateStore()
@@ -31,6 +57,7 @@ val eventTracker = DJTriggerEventTracker(eventStore)
 val screenTracker = ScreenTracker(screenStore)
 
 val ruleEngine = CandyBarRuleEngine()
+
 
 val featureFlagRepo = MockFeatureFlagRepository()
 

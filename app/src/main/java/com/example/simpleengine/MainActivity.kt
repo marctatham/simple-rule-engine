@@ -65,7 +65,7 @@ fun AppScreen() {
 
     var inputNumber by remember { mutableStateOf("0") }
 
-    val candyBarDecision: CandyBarDecision by candyBarManager.state.collectAsState(CandyBarDecision(false))
+    val candyBarDecision: CandyBarDecision by candyBarManager.state.collectAsState(CandyBarDecision(false, campaign))
 
     val screenChangeHandler: (String) -> Unit = {
         currentScreen = it
@@ -191,6 +191,7 @@ fun AppScreen() {
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold
             )
+            Stat("Campaign:", candyBarDecision.config?.title ?: "")
             Stat("Modals:", "$isModalVisible")
             Stat("Media:", "$isMediaPlaying")
             Stat("Screen:", currentScreen)

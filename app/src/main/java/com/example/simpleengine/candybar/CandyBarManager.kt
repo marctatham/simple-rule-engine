@@ -34,7 +34,7 @@ class CandyBarManager(
 
     private var currentConfig = featureFlagRepo.getFeatureConfiguration(Feature.CandyBar)
 
-    private val _state = MutableStateFlow(CandyBarDecision(show = false))
+    private val _state = MutableStateFlow(CandyBarDecision(show = false, config = null))
     val state: Flow<CandyBarDecision> = _state.asStateFlow().onEach {
         Log.i("CandyBarManager", "CandyBarDecision: ${it.show}")
     }
@@ -54,7 +54,6 @@ class CandyBarManager(
             modalFlow,
             eventsFlow
         ) { screen, media, modal, event ->
-            Log.w("CandyBarManager", "screen: $screen, media: $media, modal: $modal, event: $event")
             candyBarRuleEngine.evaluate(
                 config = currentConfig,
                 event = event,
