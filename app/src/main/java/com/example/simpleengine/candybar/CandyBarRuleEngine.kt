@@ -11,7 +11,7 @@ const val NO_SHOW = "ScreenOne"
 
 class CandyBarRuleEngine {
 
-    val declined = CandyBarDecision(show = false)
+    private val declined = CandyBarDecision(show = false)
 
     fun evaluate(
         config: CandyBarConfig,
