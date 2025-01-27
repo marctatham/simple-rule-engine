@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -173,11 +174,26 @@ fun AppScreen() {
 
         Container {
             Header("Campaign")
+
+            Column(
+                modifier = Modifier.fillMaxWidth(0.5F),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Triggers:",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                Stat("App Visits:", campaign.triggerAppVisits.toString())
+                Stat("App Visit Duration:", campaign.triggerAppVisitDurationInMinutes.toString())
+            }
+
+
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Button(onClick = {
-                     val newCampaign = if (campaign == campaignOne) campaignTwo else campaignOne
+                    val newCampaign = if (campaign == campaignOne) campaignTwo else campaignOne
                     changeCampaign(newCampaign)
 
                 }) {
