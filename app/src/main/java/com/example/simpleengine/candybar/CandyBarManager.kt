@@ -46,7 +46,7 @@ class CandyBarManager(
         val screenFlow: Flow<String> = screenStore.observeEvents()
         val mediaFlow: Flow<Boolean> = mediaStore.observeEvents()
         val modalFlow: Flow<Boolean> = modalStore.observeEvents()
-        val eventsFlow: Flow<TriggerEvent?> = eventStore.observeEvents()
+        val eventsFlow: Flow<Set<TriggerEvent>> = eventStore.observeEvents()
 
         combine(
             screenFlow,
@@ -56,7 +56,7 @@ class CandyBarManager(
         ) { screen, media, modal, event ->
             candyBarRuleEngine.evaluate(
                 config = currentConfig,
-                event = event,
+                events = event,
                 currentScreen = screen,
                 isMediaPlaying = media,
                 isModalVisible = modal

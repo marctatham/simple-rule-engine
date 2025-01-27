@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -65,7 +64,7 @@ fun AppScreen() {
     var isMediaPlaying by remember { mutableStateOf(false) }
     var currentScreen by remember { mutableStateOf(screenOne) }
     var inputNumber by remember { mutableStateOf("0") }
-    val lastEvent: TriggerEvent? by eventStore.observeEvents().collectAsState(null)
+    val events by eventStore.observeEvents().collectAsState()
     val campaign by campaignState.collectAsState()
     val candyBarDecision: CandyBarDecision by candyBarManager.state.collectAsState(
         CandyBarDecision(false)
@@ -205,7 +204,7 @@ fun AppScreen() {
         Spacer(modifier = Modifier.weight(1F))
 
         Column(
-            modifier = Modifier.fillMaxWidth(0.5F),
+            modifier = Modifier.fillMaxWidth(0.8F),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
@@ -217,7 +216,7 @@ fun AppScreen() {
             Stat("Modals:", "$isModalVisible")
             Stat("Media:", "$isMediaPlaying")
             Stat("Screen:", currentScreen)
-            Stat("Event:", "${lastEvent?.toDisplayName()}")
+            Stat("Events:", "${events.map { it.toDisplayName() }}")
 
             Result(candyBarDecision)
         }
@@ -262,7 +261,7 @@ fun AppScreenPreview() {
     AppScreen()
 }
 
-fun TriggerEvent?.toDisplayName(): String {
+fun TriggerEvent.toDisplayName(): String {
     return when (this) {
         is TriggerEvent.AppVisitEvent -> "App Visit: ${this.visitCount}"
         is TriggerEvent.AppVisitTimeEvent -> "App Duration: ${this.durationInMinutes}"

@@ -13,7 +13,7 @@ class CandyBarRuleEngine {
 
     fun evaluate(
         config: CandyBarConfig,
-        event: TriggerEvent?, // note: can be nullable if no event has taken place yet!
+        events: Set<TriggerEvent>, // note: can be nullable if no event has taken place yet!
         currentScreen: String,
         isMediaPlaying: Boolean,
         isModalVisible: Boolean,
@@ -32,21 +32,42 @@ class CandyBarRuleEngine {
         }
 
         // Rule: if the config contains a triggerAppVisits of greater than 0, it must be evaluated
-        if (config.triggerAppVisits > 0
-            && event is TriggerEvent.AppVisitEvent
-            && event.visitCount >= config.triggerAppVisits
-        ) {
-            return CandyBarDecision(show = true)
-        }
+        val eventVisits = events.find { it is TriggerEvent.AppVisitEvent } as? TriggerEvent.AppVisitEvent
+        val triggerVisits = evaluateAppVisitTrigger(config, eventVisits)
 
-        // Rule: if the config contains a triggerAppVisits of greater than 0, it must be evaluated
-        if (config.triggerAppVisitDurationInMinutes > 0
-            && event is TriggerEvent.AppVisitTimeEvent
-            && event.durationInMinutes >= config.triggerAppVisitDurationInMinutes
-        ) {
-            return CandyBarDecision(show = true)
-        }
 
-        return declined
+        val eventDuration = events.find { it is TriggerEvent.AppVisitTimeEvent } as? TriggerEvent.AppVisitTimeEvent
+        val triggerDuration = evaluateDurationTrigger(config, eventDuration)
+
+
+        val show = triggerVisits && triggerDuration
+        return CandyBarDecision(show = show)
     }
+}
+
+private fun evaluateAppVisitTrigger(
+    config: CandyBarConfig,
+    event: TriggerEvent.AppVisitEvent?
+): Boolean {
+    if (config.triggerAppVisits > 0) {
+        val visitCount = event?.visitCount ?: 0
+        val condition = visitCount >= config.triggerAppVisits
+        return condition
+    }
+
+    return false
+}
+
+
+private fun evaluateDurationTrigger(
+    config: CandyBarConfig,
+    event: TriggerEvent.AppVisitTimeEvent?
+): Boolean {
+    if (config.triggerAppVisits > 0) {
+        val duration = event?.durationInMinutes ?: 0
+        val condition = duration >= config.triggerAppVisitDurationInMinutes
+        return condition
+    }
+
+    return false
 }
