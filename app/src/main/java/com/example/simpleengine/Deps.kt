@@ -6,6 +6,7 @@ import com.example.simpleengine.candybar.media.MediaStateStore
 import com.example.simpleengine.candybar.media.MediaTracker
 import com.example.simpleengine.candybar.modals.ModalStateStore
 import com.example.simpleengine.candybar.modals.ModalTracker
+import com.example.simpleengine.candybar.repository.CandyBarRepositoryImpl
 import com.example.simpleengine.candybar.screen.ScreenStateStore
 import com.example.simpleengine.candybar.screen.ScreenTracker
 import com.example.simpleengine.candybar.triggers.DJTriggerEventStore
@@ -51,14 +52,17 @@ val campaignTwo = CandyBarConfig(
 // endregion Campaign Management
 
 private val _campaignState: MutableStateFlow<CandyBarConfig> = MutableStateFlow(campaignOne)
-fun changeCampaign(config:CandyBarConfig):Unit  { scope.launch { _campaignState.emit(config) } }
+fun changeCampaign(config: CandyBarConfig): Unit {
+    scope.launch { _campaignState.emit(config) }
+}
+
 val campaignState: StateFlow<CandyBarConfig> = _campaignState.asStateFlow()
 
 // region CandyBar Dependencies
-
 val mediaStore: MediaStateStore = MediaStateStore()
 val modalStore = ModalStateStore()
-val eventStore = DJTriggerEventStore()
+val repository = CandyBarRepositoryImpl()
+val eventStore = DJTriggerEventStore(repository)
 val screenStore = ScreenStateStore()
 
 val mediaTracker = MediaTracker(mediaStore)

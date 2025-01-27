@@ -1,5 +1,6 @@
 package com.example.simpleengine.candybar.triggers
 
+import com.example.simpleengine.candybar.repository.CandyBarRepositoryImpl
 import com.example.simpleengine.scope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -8,7 +9,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 // singleton implementation that implements each of the interfaces
-class DJTriggerEventStore {
+class DJTriggerEventStore(
+    private val candyBarRepository: CandyBarRepositoryImpl
+) {
 
     private val _state: MutableStateFlow<List<TriggerEvent>> = MutableStateFlow(emptyList())
     private val state = _state.asStateFlow()
