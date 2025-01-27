@@ -33,7 +33,12 @@ class CandyBarRuleEngine {
         }
 
         // How to check if all conditions are meet with full List?
-        val show = events.all { it.conditionsMeet } && rules.all { it -> it in events.map { it.key } }
+        val allEventsConditionsMeet = events.all { it.conditionsMeet }
+
+        // TODO: Event this rule can be configured in the config
+        val allEventsArePresent = rules.all { it -> it in events.map { it.key } }
+        
+        val show = allEventsConditionsMeet && allEventsArePresent
 
         return CandyBarDecision(show = show)
     }

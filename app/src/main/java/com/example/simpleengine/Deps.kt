@@ -68,7 +68,7 @@ val campaignState: StateFlow<CandyBarConfig> = _campaignState.asStateFlow()
 val featureFlagRepo = MockFeatureFlagRepository()
 val mediaStore: MediaStateStore = MediaStateStore()
 val modalStore = ModalStateStore()
-val eventStore = DJTriggerEventStore(featureFlagRepo = featureFlagRepo)
+val eventStore = DJTriggerEventStore()
 val screenStore = ScreenStateStore()
 
 val mediaTracker = MediaTracker(mediaStore)

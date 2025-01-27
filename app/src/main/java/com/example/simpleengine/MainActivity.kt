@@ -262,9 +262,10 @@ fun AppScreenPreview() {
     AppScreen()
 }
 
-fun CandyBarRule.toDisplayName(): String {
+fun TriggerEvent.toDisplayName(): String {
     return when (this) {
-        is CandyBarRule.AppVisitRule -> "App Visit: ${this.value} - Condition: ${this.conditionsMeet}"
-        is CandyBarRule.AppVisitTimeRule -> "App Duration: ${this.value} - Condition: ${this.conditionsMeet}"
+        is TriggerEvent.AppVisitEvent -> "App Visit: ${this.visitCount}"
+        is TriggerEvent.AppVisitTimeEvent -> "App Duration: ${this.durationInMinutes}"
+        else -> "none"
     }
 }

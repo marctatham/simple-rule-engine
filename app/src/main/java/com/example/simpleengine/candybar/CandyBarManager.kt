@@ -6,6 +6,7 @@ import com.example.simpleengine.candybar.modals.ModalStateStore
 import com.example.simpleengine.candybar.screen.ScreenStateStore
 import com.example.simpleengine.candybar.triggers.CandyBarRule
 import com.example.simpleengine.candybar.triggers.DJTriggerEventStore
+import com.example.simpleengine.candybar.triggers.TriggerEvent
 import com.example.simpleengine.experimentation.Feature
 import com.example.simpleengine.experimentation.FeatureFlagRepository
 import kotlinx.coroutines.CoroutineScope
@@ -19,7 +20,9 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.transform
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CandyBarManager(
@@ -46,7 +49,12 @@ class CandyBarManager(
         val screenFlow: Flow<String> = screenStore.observeEvents()
         val mediaFlow: Flow<Boolean> = mediaStore.observeEvents()
         val modalFlow: Flow<Boolean> = modalStore.observeEvents()
-        val eventsFlow: Flow<List<CandyBarRule>> = eventStore.observeEvents()
+        val eventsFlow: Flow<List<CandyBarRule>> = eventStore.observeEvents().transform { events ->
+            val rules = events.map { event ->
+                createTriggerAndEvaluate(event)
+            }
+            emit(rules)
+        }
 
         // TODO: Think about how to get the list of rules
         val allRulesOfCampaign = listOf(
@@ -89,4 +97,32 @@ class CandyBarManager(
             _state.emit(decision)
         }.launchIn(scope)
     }
+
+
+    private fun createTriggerAndEvaluate(triggerEvent: TriggerEvent): CandyBarRule {
+        val rule = when (triggerEvent) {
+            is TriggerEvent.AppVisitEvent -> createAppVisitRule(triggerEvent)
+            is TriggerEvent.AppVisitTimeEvent -> createAppVisitTimeRule(triggerEvent)
+            else -> throw IllegalArgumentException("Unknown trigger type: ${triggerEvent.key}")
+        }
+
+        rule.evaluate()
+        return rule
+    }
+
+    private fun createAppVisitRule(triggerEvent: TriggerEvent.AppVisitEvent): CandyBarRule.AppVisitRule {
+        val condition = currentConfig.triggerAppVisits
+        // TODO: How to get the actual number of app visits for the user from storage?
+        val value = triggerEvent.visitCount
+
+        return CandyBarRule.AppVisitRule(condition, value)
+    }
+
+    private fun createAppVisitTimeRule(triggerEvent: TriggerEvent.AppVisitTimeEvent): CandyBarRule.AppVisitTimeRule {
+        val condition = currentConfig.triggerAppVisitDurationInMinutes
+        val value = triggerEvent.durationInMinutes
+
+        return CandyBarRule.AppVisitTimeRule(condition, value)
+    }
 }
+
