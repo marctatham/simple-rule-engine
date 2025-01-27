@@ -84,6 +84,36 @@ fun AppScreen() {
             .verticalScroll(rememberScrollState()),
     ) {
         Container {
+            Header(campaign.title.uppercase())
+
+            Column(
+                modifier = Modifier.fillMaxWidth(0.5F),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Triggers:",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                Stat("App Visits:", campaign.triggerAppVisits.toString())
+                Stat("App Visit Duration:", campaign.triggerAppVisitDurationInMinutes.toString())
+            }
+
+
+            Row(
+                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Button(onClick = {
+                    val newCampaign = if (campaign == campaignOne) campaignTwo else campaignOne
+                    changeCampaign(newCampaign)
+
+                }) {
+                    Text(text = if (campaign == campaignOne) "Campaign1" else "campaign2")
+                }
+            }
+        }
+
+        Container {
             Header("Universal Rules")
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
@@ -168,36 +198,6 @@ fun AppScreen() {
                     screenChangeHandler(screen)
                 }) {
                     Text(text = screenFour)
-                }
-            }
-        }
-
-        Container {
-            Header("Campaign")
-
-            Column(
-                modifier = Modifier.fillMaxWidth(0.5F),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Triggers:",
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
-                )
-                Stat("App Visits:", campaign.triggerAppVisits.toString())
-                Stat("App Visit Duration:", campaign.triggerAppVisitDurationInMinutes.toString())
-            }
-
-
-            Row(
-                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                Button(onClick = {
-                    val newCampaign = if (campaign == campaignOne) campaignTwo else campaignOne
-                    changeCampaign(newCampaign)
-
-                }) {
-                    Text(text = if (campaign == campaignOne) "Campaign1" else "campaign2")
                 }
             }
         }
