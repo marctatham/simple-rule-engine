@@ -13,7 +13,7 @@ class CandyBarRuleEngine {
 
     fun evaluate(
         config: CandyBarConfig,
-        events: Set<TriggerEvent>, // note: can be nullable if no event has taken place yet!
+        events: List<TriggerEvent>, // note: can be nullable if no event has taken place yet!
         currentScreen: String,
         isMediaPlaying: Boolean,
         isModalVisible: Boolean,
