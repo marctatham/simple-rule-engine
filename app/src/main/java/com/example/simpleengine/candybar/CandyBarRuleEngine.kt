@@ -22,7 +22,7 @@ class CandyBarRuleEngine {
     ): CandyBarDecision {
 
         // let's do the easy part, short-circuit for any deal-breaker scenarios
-        val declined = CandyBarDecision(show = false, config = config)
+        val declined = CandyBarDecision(show = false)
         if (!config.isEnabled
             || NO_SHOW_PAGES.contains(currentScreen)
             || isMediaPlaying
@@ -36,7 +36,7 @@ class CandyBarRuleEngine {
             && event is TriggerEvent.AppVisitEvent
             && event.visitCount >= config.triggerAppVisits
         ) {
-            return CandyBarDecision(show = true, config = config)
+            return CandyBarDecision(show = true)
         }
 
         // Rule: if the config contains a triggerAppVisits of greater than 0, it must be evaluated
@@ -44,7 +44,7 @@ class CandyBarRuleEngine {
             && event is TriggerEvent.AppVisitTimeEvent
             && event.durationInMinutes >= config.triggerAppVisitDurationInMinutes
         ) {
-            return CandyBarDecision(show = true, config = config)
+            return CandyBarDecision(show = true)
         }
 
         return declined

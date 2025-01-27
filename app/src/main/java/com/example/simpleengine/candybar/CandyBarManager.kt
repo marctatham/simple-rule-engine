@@ -34,7 +34,7 @@ class CandyBarManager(
 
     private var currentConfig = featureFlagRepo.getFeatureConfiguration(Feature.CandyBar)
 
-    private val _state = MutableStateFlow(CandyBarDecision(show = false, config = null))
+    private val _state = MutableStateFlow(CandyBarDecision(show = false))
     val state: Flow<CandyBarDecision> = _state.asStateFlow().onEach {
         Log.i("CandyBarManager", "CandyBarDecision: ${it.show}")
     }

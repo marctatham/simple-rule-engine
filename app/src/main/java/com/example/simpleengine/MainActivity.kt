@@ -63,15 +63,11 @@ fun AppScreen() {
     var isModalVisible by remember { mutableStateOf(false) }
     var isMediaPlaying by remember { mutableStateOf(false) }
     var currentScreen by remember { mutableStateOf(screenOne) }
-    val lastEvent: TriggerEvent? by eventStore.observeEvents().collectAsState(null)
-    var campaign by remember { mutableStateOf(campaign) }
-
     var inputNumber by remember { mutableStateOf("0") }
-
+    val lastEvent: TriggerEvent? by eventStore.observeEvents().collectAsState(null)
+    val campaign by campaignState.collectAsState()
     val candyBarDecision: CandyBarDecision by candyBarManager.state.collectAsState(
-        CandyBarDecision(
-            false, com.example.simpleengine.campaign
-        )
+        CandyBarDecision(false)
     )
 
     val screenChangeHandler: (String) -> Unit = {
@@ -181,7 +177,9 @@ fun AppScreen() {
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Button(onClick = {
-                    campaign = if (campaign == campaignOne) campaignTwo else campaignOne
+                     val newCampaign = if (campaign == campaignOne) campaignTwo else campaignOne
+                    changeCampaign(newCampaign)
+
                 }) {
                     Text(text = if (campaign == campaignOne) "Campaign1" else "campaign2")
                 }
@@ -199,7 +197,7 @@ fun AppScreen() {
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold
             )
-            Stat("Campaign:", candyBarDecision.config?.title ?: "")
+            Stat("Campaign:", campaign.title)
             Stat("Modals:", "$isModalVisible")
             Stat("Media:", "$isMediaPlaying")
             Stat("Screen:", currentScreen)
