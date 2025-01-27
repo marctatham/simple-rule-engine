@@ -54,7 +54,6 @@ class CandyBarManager(
             modalFlow,
             eventsFlow
         ) { screen, media, modal, event ->
-            Log.w("CandyBarManager", "screen: $screen, media: $media, modal: $modal, event: $event")
             candyBarRuleEngine.evaluate(
                 config = currentConfig,
                 event = event,

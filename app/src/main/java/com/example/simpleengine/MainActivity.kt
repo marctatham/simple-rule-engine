@@ -9,9 +9,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -24,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -31,6 +34,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.simpleengine.candybar.CandyBarDecision
 import com.example.simpleengine.candybar.triggers.TriggerEvent
+import com.example.simpleengine.ui.Container
+import com.example.simpleengine.ui.Header
 
 // TODO: State management on a per-campaign basis (clearing state if the campaign changes)
 // TODO: Delay of enacting the candybar
@@ -46,21 +51,25 @@ class MainActivity : ComponentActivity() {
             AppScreen()
         }
     }
-
-
 }
+
+
+const val screenOne = "ScreenOne"
+const val screenTwo = "ScreenTwo"
+const val screenThree = "ScreenThree"
+const val screenFour = "ScreenFour"
 
 @Composable
 fun AppScreen() {
-
-
     var isModalVisible by remember { mutableStateOf(false) }
-    var isVideoOn by remember { mutableStateOf(false) }
-    var currentScreen by remember { mutableStateOf("Home") }
-    var lastEvent by remember { mutableStateOf("No Event") }
+    var isMediaPlaying by remember { mutableStateOf(false) }
+    var currentScreen by remember { mutableStateOf(screenOne) }
     var inputNumber by remember { mutableStateOf("0") }
-
-    val candyBarDecision = candyBarManager.state.collectAsState(CandyBarDecision(false))
+    val lastEvent: TriggerEvent? by eventStore.observeEvents().collectAsState(null)
+    val campaign by campaignState.collectAsState()
+    val candyBarDecision: CandyBarDecision by candyBarManager.state.collectAsState(
+        CandyBarDecision(false)
+    )
 
     val screenChangeHandler: (String) -> Unit = {
         currentScreen = it
@@ -68,19 +77,44 @@ fun AppScreen() {
     }
 
     Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.SpaceBetween,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
     ) {
+        Container {
+            Header(campaign.title.uppercase())
 
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = "Universal Rules",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
+            Column(
+                modifier = Modifier.fillMaxWidth(0.5F),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Triggers:",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                Stat("App Visits:", campaign.triggerAppVisits.toString())
+                Stat("App Visit Duration:", campaign.triggerAppVisitDurationInMinutes.toString())
+            }
+
+
+            Row(
+                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Button(onClick = {
+                    val newCampaign = if (campaign == campaignOne) campaignTwo else campaignOne
+                    changeCampaign(newCampaign)
+
+                }) {
+                    Text(text = if (campaign == campaignOne) "Campaign1" else "campaign2")
+                }
+            }
+        }
+
+        Container {
+            Header("Universal Rules")
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
             ) {
@@ -92,33 +126,26 @@ fun AppScreen() {
                 }
 
                 Button(onClick = {
-                    isVideoOn = !isVideoOn
-                    mediaTracker.track(isVideoOn)
+                    isMediaPlaying = !isMediaPlaying
+                    mediaTracker.track(isMediaPlaying)
                 }) {
-                    Text(text = if (isVideoOn) "Video ON" else "Video OFF")
+                    Text(text = if (isMediaPlaying) "Video ON" else "Video OFF")
                 }
             }
+        }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "Events",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
+        Container {
+            Header("Events")
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Button(onClick = {
-                    lastEvent = "app_visit: $inputNumber"
-
                     eventTracker.track(TriggerEvent.AppVisitEvent(inputNumber.toInt()))
                 }) {
                     Text(textAlign = TextAlign.Center, text = "Trigger\napp_visit")
                 }
 
                 Button(onClick = {
-                    lastEvent = "scroll_articles: $inputNumber"
                     eventTracker.track(TriggerEvent.AppVisitTimeEvent(inputNumber.toInt()))
                 }) {
                     Text(textAlign = TextAlign.Center, text = "Trigger\nscroll_articles")
@@ -137,68 +164,95 @@ fun AppScreen() {
                     .fillMaxWidth()
                     .padding(bottom = 16.dp)
             )
+        }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "Navigation",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
+        Container {
+            Header("Navigation")
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Button(onClick = {
-                    val screen = "ScreenOne"
+                    val screen = screenOne
                     screenChangeHandler(screen)
                 }) {
-                    Text(text = "ScreenOne")
+                    Text(text = screenOne)
                 }
                 Button(onClick = {
-                    val screen = "ScreenTwo"
+                    val screen = screenTwo
                     screenChangeHandler(screen)
                 }) {
-                    Text(text = "ScreenTwo")
+                    Text(text = screenTwo)
                 }
             }
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Button(onClick = {
-                    val screen = "ScreenThree"
+                    val screen = screenThree
                     screenChangeHandler(screen)
                 }) {
-                    Text(text = "ScreenThree")
+                    Text(text = screenThree)
                 }
                 Button(onClick = {
-                    val screen = "ScreenFour"
+                    val screen = screenFour
                     screenChangeHandler(screen)
                 }) {
-                    Text(text = "ScreenFour")
+                    Text(text = screenFour)
                 }
             }
         }
 
+        Spacer(modifier = Modifier.weight(1F))
+
         Column(
-            modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.fillMaxWidth(0.5F),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "CandyBar Decision: ${candyBarDecision.value.show}",
+                text = "Key Metrics:",
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold
             )
+            Stat("Campaign:", campaign.title)
+            Stat("Modals:", "$isModalVisible")
+            Stat("Media:", "$isMediaPlaying")
+            Stat("Screen:", currentScreen)
+            Stat("Event:", "${lastEvent?.toDisplayName()}")
 
-            Text(
-                text = "Last Event: $lastEvent",
-                style = MaterialTheme.typography.bodyLarge,
-            )
-
-            Text(
-                text = "Current Screen: $currentScreen",
-                style = MaterialTheme.typography.bodyLarge,
-            )
+            Result(candyBarDecision)
         }
 
+    }
+}
+
+@Composable
+fun Stat(title: String, value: String) {
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = title, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1F)
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyLarge,
+        )
+    }
+}
+
+@Composable
+fun Result(result: CandyBarDecision) {
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = "Show CandyBar:",
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.weight(1F)
+        )
+        Text(
+            text = result.show.toString(),
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold,
+            color = if (result.show) Color.Green else Color.Red
+        )
     }
 }
 
@@ -206,4 +260,12 @@ fun AppScreen() {
 @Composable
 fun AppScreenPreview() {
     AppScreen()
+}
+
+fun TriggerEvent?.toDisplayName(): String {
+    return when (this) {
+        is TriggerEvent.AppVisitEvent -> "App Visit: ${this.visitCount}"
+        is TriggerEvent.AppVisitTimeEvent -> "App Duration: ${this.durationInMinutes}"
+        else -> "none"
+    }
 }

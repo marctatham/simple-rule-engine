@@ -1,19 +1,17 @@
 package com.example.simpleengine.experimentation
 
+import com.example.simpleengine.campaignState
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+
+
 @Suppress("UNCHECKED_CAST")
 class MockFeatureFlagRepository : FeatureFlagRepository {
 
     override fun <T : FeatureConfig> getFeatureConfiguration(feature: Feature<T>): T {
-        // This is a mock implementation, return any value we want
-        return CandyBarConfig(
-            isEnabled = true,
-            variationKey = "variationKey",
-            title = "title",
-            description = "description",
-            triggerAppVisits = 2,
-            triggerAppVisitDurationInMinutes = 3,
-            coolOffPeriodInDays = 1,
-            popUpDelayInMilliseconds = 3000
-        ) as T
+        // just grab the most recent emission from the hacked together campaignstate flow for now
+        val campaign = runBlocking { campaignState.first() }
+
+        return campaign as T
     }
 }
