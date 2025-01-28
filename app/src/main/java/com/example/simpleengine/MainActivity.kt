@@ -32,7 +32,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.simpleengine.candybar.CandyBarDecision
-import com.example.simpleengine.candybar.triggers.CandyBarRule
 import com.example.simpleengine.candybar.triggers.TriggerEvent
 import com.example.simpleengine.ui.Container
 import com.example.simpleengine.ui.Header
@@ -146,7 +145,7 @@ fun AppScreen() {
                 }
 
                 Button(onClick = {
-                    eventTracker.track(TriggerEvent.AppVisitTimeEvent(inputNumber.toInt()))
+                    eventTracker.track(TriggerEvent.AppVisitDurationEvent(inputNumber.toInt()))
                 }) {
                     Text(textAlign = TextAlign.Center, text = "Trigger\nscroll_articles")
                 }
@@ -265,7 +264,7 @@ fun AppScreenPreview() {
 fun TriggerEvent.toDisplayName(): String {
     return when (this) {
         is TriggerEvent.AppVisitEvent -> "App Visit: ${this.visitCount}"
-        is TriggerEvent.AppVisitTimeEvent -> "App Duration: ${this.durationInMinutes}"
+        is TriggerEvent.AppVisitDurationEvent -> "App Duration: ${this.durationInMinutes}"
         else -> "none"
     }
 }

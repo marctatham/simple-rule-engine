@@ -1,10 +1,9 @@
 package com.example.simpleengine
 
-import android.app.Application
-import android.content.Context
-import android.content.SharedPreferences
 import com.example.simpleengine.candybar.CandyBarManager
 import com.example.simpleengine.candybar.CandyBarRuleEngine
+import com.example.simpleengine.candybar.ConfigRuleEvaluator
+import com.example.simpleengine.candybar.TriggerEvaluator
 import com.example.simpleengine.candybar.media.MediaStateStore
 import com.example.simpleengine.candybar.media.MediaTracker
 import com.example.simpleengine.candybar.modals.ModalStateStore
@@ -85,7 +84,9 @@ val candyBarManager = CandyBarManager(
     screenStore = screenStore,
     candyBarRuleEngine = ruleEngine,
     featureFlagRepo = featureFlagRepo,
-    scope = scope
+    scope = scope,
+    triggerEvaluator = TriggerEvaluator(),
+    ruleEvaluator = ConfigRuleEvaluator()
 )
 
 // endregion CandyBar Dependencies
