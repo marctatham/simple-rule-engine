@@ -27,7 +27,7 @@ class CandyBarRuleEngine {
             || isMediaPlaying
             || isModalVisible
         ) {
-            return  CandyBarDecision(show = false)
+            return CandyBarDecision(show = false)
         }
 
         // How to check if all conditions are meet with full List?
