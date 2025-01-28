@@ -13,7 +13,7 @@ class CandyBarRuleEngine {
 
     fun evaluate(
         config: CandyBarConfig,
-        events: List<ResolvedTrigger>,
+        resolvedTriggers: List<ResolvedTrigger>,
         currentScreen: String,
         isMediaPlaying: Boolean,
         isModalVisible: Boolean,
@@ -31,7 +31,7 @@ class CandyBarRuleEngine {
         }
 
         // How to check if all conditions are meet with full List?
-        val areTriggerConditionsMet = events.all { it.isConditionMet }
+        val areTriggerConditionsMet = resolvedTriggers.all { it.isConditionMet }
         return CandyBarDecision(show = areTriggerConditionsMet)
     }
 }

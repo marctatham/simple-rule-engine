@@ -3,6 +3,7 @@ package com.example.simpleengine
 import com.example.simpleengine.candybar.CandyBarManager
 import com.example.simpleengine.candybar.CandyBarRuleEngine
 import com.example.simpleengine.candybar.ConfigTriggerEvaluator
+import com.example.simpleengine.candybar.MockAppVisitStore
 import com.example.simpleengine.candybar.TriggerEvaluator
 import com.example.simpleengine.candybar.media.MediaStateStore
 import com.example.simpleengine.candybar.media.MediaTracker
@@ -52,10 +53,8 @@ val campaignTwo = CandyBarConfig(
 
 // endregion Campaign Management
 private val _campaignState: MutableStateFlow<CandyBarConfig> = MutableStateFlow(campaignOne)
-fun changeCampaign(config: CandyBarConfig): Unit {
-
+fun changeCampaign(config: CandyBarConfig) {
     scope.launch {
-        eventStore.clearEvents()
         _campaignState.emit(config)
     }
 }
@@ -70,9 +69,11 @@ val modalStore = ModalStateStore()
 val eventStore = DJTriggerEventStore()
 val screenStore = ScreenStateStore()
 
+val appVisitStore = MockAppVisitStore()
+
 val mediaTracker = MediaTracker(mediaStore)
 val modalTracker = ModalTracker(modalStore)
-val eventTracker = DJTriggerEventTracker(eventStore)
+val eventTracker = DJTriggerEventTracker(eventStore, appVisitStore)
 val screenTracker = ScreenTracker(screenStore)
 
 val ruleEngine = CandyBarRuleEngine()
@@ -85,7 +86,7 @@ val candyBarManager = CandyBarManager(
     candyBarRuleEngine = ruleEngine,
     featureFlagRepo = featureFlagRepo,
     scope = scope,
-    triggerEvaluator = TriggerEvaluator(),
+    triggerEvaluator = TriggerEvaluator(appVisitStore),
     ruleEvaluator = ConfigTriggerEvaluator()
 )
 

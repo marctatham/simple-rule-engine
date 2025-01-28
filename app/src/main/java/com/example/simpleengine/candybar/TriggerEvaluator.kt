@@ -4,7 +4,7 @@ import com.example.simpleengine.candybar.triggers.ResolvedTrigger
 import com.example.simpleengine.candybar.triggers.TriggerEvent
 
 class TriggerEvaluator(
-    private val appVisitStore: AppVisitsStore = MockAppVisitStore() // mocked, for illustrative purposes
+    private val appVisitStore: AppVisitsStore // mocked, for illustrative purposes
 ) {
 
     fun evaluate(rules: List<CandyBarTriggers>, events: List<TriggerEvent>): List<ResolvedTrigger> {
@@ -18,8 +18,12 @@ class TriggerEvaluator(
         return resolvedTriggers
     }
 
-    private fun evaluateAppVisitTrigger(rule: CandyBarTriggers.VisitCount, events: List<TriggerEvent>): ResolvedTrigger {
-        val event: TriggerEvent.AppVisitEvent? = events.firstOrNull { it is TriggerEvent.AppVisitEvent } as? TriggerEvent.AppVisitEvent
+    private fun evaluateAppVisitTrigger(
+        rule: CandyBarTriggers.VisitCount,
+        events: List<TriggerEvent>
+    ): ResolvedTrigger {
+        val event: TriggerEvent.AppVisitEvent? =
+            events.firstOrNull { it is TriggerEvent.AppVisitEvent } as? TriggerEvent.AppVisitEvent
         // TODO: might be a good idea to showcase behaviour between Trigger & AppVisit Store
         // like how maybe all we get is a triggerEvent.NewVisit with no additional data, and
         // that results in an increment in the store and returning out the current visit count since
@@ -36,8 +40,12 @@ class TriggerEvaluator(
         )
     }
 
-    private fun evaluateAppDurationTrigger(rule: CandyBarTriggers.VisitDuration, events: List<TriggerEvent>): ResolvedTrigger {
-        val event = events.firstOrNull { it is TriggerEvent.AppVisitDurationEvent } as? TriggerEvent.AppVisitDurationEvent
+    private fun evaluateAppDurationTrigger(
+        rule: CandyBarTriggers.VisitDuration,
+        events: List<TriggerEvent>
+    ): ResolvedTrigger {
+        val event =
+            events.firstOrNull { it is TriggerEvent.AppVisitDurationEvent } as? TriggerEvent.AppVisitDurationEvent
         return event?.let {
             ResolvedTrigger(
                 rule = rule,
@@ -55,9 +63,25 @@ class TriggerEvaluator(
 
 interface AppVisitsStore {
     val visitCount: Int
+
+    fun incrementVisitCount()
+
+    fun clearStore()
 }
 
-class MockAppVisitStore: AppVisitsStore {
-    override val visitCount: Int = 3
+class MockAppVisitStore : AppVisitsStore {
+
+    private var _visitCount = 0
+
+    override val visitCount: Int
+        get() = _visitCount
+
+    override fun incrementVisitCount() {
+        _visitCount += 1
+    }
+
+    override fun clearStore() {
+        _visitCount = 0
+    }
 }
 

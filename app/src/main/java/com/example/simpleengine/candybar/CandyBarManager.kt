@@ -1,10 +1,10 @@
 package com.example.simpleengine.candybar
 
 import android.util.Log
+import com.example.simpleengine.appVisitStore
 import com.example.simpleengine.candybar.media.MediaStateStore
 import com.example.simpleengine.candybar.modals.ModalStateStore
 import com.example.simpleengine.candybar.screen.ScreenStateStore
-import com.example.simpleengine.candybar.triggers.ResolvedTrigger
 import com.example.simpleengine.candybar.triggers.DJTriggerEventStore
 import com.example.simpleengine.experimentation.Feature
 import com.example.simpleengine.experimentation.FeatureFlagRepository
@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.transform
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CandyBarManager(
@@ -36,6 +35,7 @@ class CandyBarManager(
     private val ruleEvaluator: ConfigTriggerEvaluator,
 ) {
 
+    // initialise from the dataStore
     private var currentConfig = featureFlagRepo.getFeatureConfiguration(Feature.CandyBar)
 
     private val _state = MutableStateFlow(CandyBarDecision(show = false))
@@ -48,24 +48,35 @@ class CandyBarManager(
         val screenFlow: Flow<String> = screenStore.observeEvents()
         val mediaFlow: Flow<Boolean> = mediaStore.observeEvents()
         val modalFlow: Flow<Boolean> = modalStore.observeEvents()
-        val eventsFlow: Flow<List<ResolvedTrigger>> =
-            eventStore.observeEvents().transform { events ->
-                val config = featureFlagRepo.getFeatureConfiguration(Feature.CandyBar)
-                val rules = ruleEvaluator.evalRules(config)
-                val resolvedTriggers = triggerEvaluator.evaluate(rules, events)
-                emit(resolvedTriggers)
-            }
+        val eventsFlow = eventStore.observeEvents()
 
         // combine all flows, such that an emission on any flow will
         // result in a new decision being made
         combine(
             screenFlow, mediaFlow, modalFlow, eventsFlow
-        ) { screen, media, modal, event ->
+        ) { screen, media, modal, events ->
+
+            // NOte: important that the indicator for needing to clear state is dictated by the variationKey
+            // other candyBar configuration CAN change, and should have NO impact on resettting of campaign state
             val config = featureFlagRepo.getFeatureConfiguration(Feature.CandyBar)
+            val hasCampaignChanged = currentConfig.variationKey != config.variationKey
+
+            // If the campaign has changed for whatever reason, we must clear out any campaign-specific state
+            if (hasCampaignChanged) {
+                appVisitStore.clearStore()
+                eventStore.clearEvents()
+            }
+
+            // NOTE: we must update the currentConfig here, as we are about to evaluate the rules
+            // TODO: maybe we can make this just another action that happens on the chain of events
+            currentConfig = config
+
+            val rules = ruleEvaluator.evalRules(config)
+            val resolvedTriggers = triggerEvaluator.evaluate(rules, events)
 
             candyBarRuleEngine.evaluate(
                 config = config,
-                events = event,
+                resolvedTriggers = resolvedTriggers,
                 currentScreen = screen,
                 isMediaPlaying = media,
                 isModalVisible = modal
