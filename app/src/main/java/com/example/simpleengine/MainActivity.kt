@@ -35,6 +35,7 @@ import com.example.simpleengine.candybar.CandyBarDecision
 import com.example.simpleengine.candybar.triggers.TriggerEvent
 import com.example.simpleengine.ui.Container
 import com.example.simpleengine.ui.Header
+import com.example.simpleengine.ui.theme.AppTheme
 
 // TODO: State management on a per-campaign basis (clearing state if the campaign changes)
 // TODO: Delay of enacting the candybar
@@ -47,7 +48,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AppScreen()
+            AppTheme {
+                AppScreen()
+            }
         }
     }
 }
@@ -82,7 +85,7 @@ fun AppScreen() {
             .padding(16.dp)
             .verticalScroll(rememberScrollState()),
     ) {
-        Container {
+        Container(MaterialTheme.colorScheme.primaryContainer) {
             Header(campaign.title.uppercase())
 
             Column(
