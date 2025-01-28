@@ -139,7 +139,7 @@ fun AppScreen() {
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Button(onClick = {
-                    eventTracker.track(TriggerEvent.AppVisitEvent(inputNumber.toInt()))
+                    eventTracker.track(TriggerEvent.AppVisitEvent)
                 }) {
                     Text(textAlign = TextAlign.Center, text = "Trigger\napp_visit")
                 }
@@ -262,7 +262,7 @@ fun AppScreenPreview() {
 
 fun TriggerEvent.toDisplayName(): String {
     return when (this) {
-        is TriggerEvent.AppVisitEvent -> "App Visit: ${this.visitCount}"
+        is TriggerEvent.AppVisitEvent -> "App Visit"
         is TriggerEvent.AppVisitDurationEvent -> "App Duration: ${this.durationInMinutes}"
         else -> "none"
     }
