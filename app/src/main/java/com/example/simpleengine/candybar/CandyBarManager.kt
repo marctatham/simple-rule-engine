@@ -4,8 +4,8 @@ import android.util.Log
 import com.example.simpleengine.candybar.media.MediaStateStore
 import com.example.simpleengine.candybar.modals.ModalStateStore
 import com.example.simpleengine.candybar.screen.ScreenStateStore
+import com.example.simpleengine.candybar.triggers.ResolvedTrigger
 import com.example.simpleengine.candybar.triggers.DJTriggerEventStore
-import com.example.simpleengine.candybar.triggers.TriggerEvent
 import com.example.simpleengine.experimentation.Feature
 import com.example.simpleengine.experimentation.FeatureFlagRepository
 import kotlinx.coroutines.CoroutineScope
@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.transform
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CandyBarManager(
@@ -30,6 +31,9 @@ class CandyBarManager(
     private val modalStore: ModalStateStore,
     private val eventStore: DJTriggerEventStore,
     private val scope: CoroutineScope, // define what thread it runs on, etc.
+
+    private val triggerEvaluator: TriggerEvaluator,
+    private val ruleEvaluator: ConfigTriggerEvaluator,
 ) {
 
     private var currentConfig = featureFlagRepo.getFeatureConfiguration(Feature.CandyBar)
@@ -40,28 +44,34 @@ class CandyBarManager(
     }
 
     init {
-        // observe things that I care about:
-        // start:
-        // collecting emissions from the ReadableTriggerEventStore
+        // define the observe flows that impact the decision:
         val screenFlow: Flow<String> = screenStore.observeEvents()
         val mediaFlow: Flow<Boolean> = mediaStore.observeEvents()
         val modalFlow: Flow<Boolean> = modalStore.observeEvents()
-        val eventsFlow: Flow<TriggerEvent?> = eventStore.observeEvents()
+        val eventsFlow: Flow<List<ResolvedTrigger>> =
+            eventStore.observeEvents().transform { events ->
+                val config = featureFlagRepo.getFeatureConfiguration(Feature.CandyBar)
+                val rules = ruleEvaluator.evalRules(config)
+                val resolvedTriggers = triggerEvaluator.evaluate(rules, events)
+                emit(resolvedTriggers)
+            }
 
+        // combine all flows, such that an emission on any flow will
+        // result in a new decision being made
         combine(
-            screenFlow,
-            mediaFlow,
-            modalFlow,
-            eventsFlow
+            screenFlow, mediaFlow, modalFlow, eventsFlow
         ) { screen, media, modal, event ->
+            val config = featureFlagRepo.getFeatureConfiguration(Feature.CandyBar)
+
             candyBarRuleEngine.evaluate(
-                config = currentConfig,
-                event = event,
+                config = config,
+                events = event,
                 currentScreen = screen,
                 isMediaPlaying = media,
                 isModalVisible = modal
             )
-        }.flatMapLatest { decision -> // flatMapLatest: Cancel the previous flow and start a new one
+        }.flatMapLatest { decision ->
+            // if we have
             if (decision.show) {
                 flow {
                     Log.w(
@@ -83,3 +93,4 @@ class CandyBarManager(
         }.launchIn(scope)
     }
 }
+

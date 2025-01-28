@@ -1,12 +1,12 @@
 package com.example.simpleengine.candybar.triggers
 
-sealed class TriggerEvent(val key: String) {
+sealed class TriggerEvent {
 
-    class AppVisitEvent(val visitCount:Int) : TriggerEvent("app_visit")
+    data object AppVisitEvent : TriggerEvent()
+
+    class AppVisitDurationEvent(val durationInMinutes: Int) : TriggerEvent()
 
     // Example event; "scrolledThroughArticles" will be implemented in future
-    class ScrolledThroughArticles(val scrolledThroughArticles: Int) : TriggerEvent("article_scroll_through")
-
-    class AppVisitTimeEvent(val durationInMinutes:Int) : TriggerEvent("app_visit_time") // might not make
+    class ScrolledThroughArticles(val scrolledThroughArticles: Int) : TriggerEvent()
 
 }

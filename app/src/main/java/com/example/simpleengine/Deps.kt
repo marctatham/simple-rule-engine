@@ -2,6 +2,8 @@ package com.example.simpleengine
 
 import com.example.simpleengine.candybar.CandyBarManager
 import com.example.simpleengine.candybar.CandyBarRuleEngine
+import com.example.simpleengine.candybar.ConfigTriggerEvaluator
+import com.example.simpleengine.candybar.TriggerEvaluator
 import com.example.simpleengine.candybar.media.MediaStateStore
 import com.example.simpleengine.candybar.media.MediaTracker
 import com.example.simpleengine.candybar.modals.ModalStateStore
@@ -42,20 +44,27 @@ val campaignTwo = CandyBarConfig(
     variationKey = "marketing2",
     title = "campaign2",
     description = "leDescription2",
-    triggerAppVisits = 0,
+    triggerAppVisits = 3,
     triggerAppVisitDurationInMinutes = 2,
     coolOffPeriodInDays = 3,
     popUpDelayInMilliseconds = 3000
 )
 
 // endregion Campaign Management
-
 private val _campaignState: MutableStateFlow<CandyBarConfig> = MutableStateFlow(campaignOne)
-fun changeCampaign(config:CandyBarConfig):Unit  { scope.launch { _campaignState.emit(config) } }
+fun changeCampaign(config: CandyBarConfig): Unit {
+
+    scope.launch {
+        eventStore.clearEvents()
+        _campaignState.emit(config)
+    }
+}
+
 val campaignState: StateFlow<CandyBarConfig> = _campaignState.asStateFlow()
 
 // region CandyBar Dependencies
 
+val featureFlagRepo = MockFeatureFlagRepository()
 val mediaStore: MediaStateStore = MediaStateStore()
 val modalStore = ModalStateStore()
 val eventStore = DJTriggerEventStore()
@@ -68,8 +77,6 @@ val screenTracker = ScreenTracker(screenStore)
 
 val ruleEngine = CandyBarRuleEngine()
 
-val featureFlagRepo = MockFeatureFlagRepository()
-
 val candyBarManager = CandyBarManager(
     mediaStore = mediaStore,
     modalStore = modalStore,
@@ -77,7 +84,9 @@ val candyBarManager = CandyBarManager(
     screenStore = screenStore,
     candyBarRuleEngine = ruleEngine,
     featureFlagRepo = featureFlagRepo,
-    scope = scope
+    scope = scope,
+    triggerEvaluator = TriggerEvaluator(),
+    ruleEvaluator = ConfigTriggerEvaluator()
 )
 
 // endregion CandyBar Dependencies

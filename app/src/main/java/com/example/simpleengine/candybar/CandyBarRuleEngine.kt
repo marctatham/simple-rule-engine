@@ -1,6 +1,6 @@
 package com.example.simpleengine.candybar
 
-import com.example.simpleengine.candybar.triggers.TriggerEvent
+import com.example.simpleengine.candybar.triggers.ResolvedTrigger
 import com.example.simpleengine.experimentation.CandyBarConfig
 
 // must be stateless
@@ -13,7 +13,7 @@ class CandyBarRuleEngine {
 
     fun evaluate(
         config: CandyBarConfig,
-        event: TriggerEvent?, // note: can be nullable if no event has taken place yet!
+        events: List<ResolvedTrigger>,
         currentScreen: String,
         isMediaPlaying: Boolean,
         isModalVisible: Boolean,
@@ -22,31 +22,16 @@ class CandyBarRuleEngine {
     ): CandyBarDecision {
 
         // let's do the easy part, short-circuit for any deal-breaker scenarios
-        val declined = CandyBarDecision(show = false)
         if (!config.isEnabled
             || NO_SHOW_PAGES.contains(currentScreen)
             || isMediaPlaying
             || isModalVisible
         ) {
-            return declined
+            return CandyBarDecision(show = false)
         }
 
-        // Rule: if the config contains a triggerAppVisits of greater than 0, it must be evaluated
-        if (config.triggerAppVisits > 0
-            && event is TriggerEvent.AppVisitEvent
-            && event.visitCount >= config.triggerAppVisits
-        ) {
-            return CandyBarDecision(show = true)
-        }
-
-        // Rule: if the config contains a triggerAppVisits of greater than 0, it must be evaluated
-        if (config.triggerAppVisitDurationInMinutes > 0
-            && event is TriggerEvent.AppVisitTimeEvent
-            && event.durationInMinutes >= config.triggerAppVisitDurationInMinutes
-        ) {
-            return CandyBarDecision(show = true)
-        }
-
-        return declined
+        // How to check if all conditions are meet with full List?
+        val areTriggerConditionsMet = events.all { it.isConditionMet }
+        return CandyBarDecision(show = areTriggerConditionsMet)
     }
 }
