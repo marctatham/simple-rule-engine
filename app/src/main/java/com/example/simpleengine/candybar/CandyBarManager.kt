@@ -50,7 +50,8 @@ class CandyBarManager(
         val modalFlow: Flow<Boolean> = modalStore.observeEvents()
         val eventsFlow: Flow<List<ResolvedTrigger>> =
             eventStore.observeEvents().transform { events ->
-                val rules = ruleEvaluator.evalRules(currentConfig)
+                val config = featureFlagRepo.getFeatureConfiguration(Feature.CandyBar)
+                val rules = ruleEvaluator.evalRules(config)
                 val resolvedTriggers = triggerEvaluator.evaluate(rules, events)
                 emit(resolvedTriggers)
             }
@@ -60,8 +61,10 @@ class CandyBarManager(
         combine(
             screenFlow, mediaFlow, modalFlow, eventsFlow
         ) { screen, media, modal, event ->
+            val config = featureFlagRepo.getFeatureConfiguration(Feature.CandyBar)
+
             candyBarRuleEngine.evaluate(
-                config = currentConfig,
+                config = config,
                 events = event,
                 currentScreen = screen,
                 isMediaPlaying = media,
