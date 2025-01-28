@@ -33,7 +33,7 @@ class CandyBarManager(
     private val scope: CoroutineScope, // define what thread it runs on, etc.
 
     private val triggerEvaluator: TriggerEvaluator,
-    private val ruleEvaluator: ConfigRuleEvaluator,
+    private val ruleEvaluator: ConfigTriggerEvaluator,
 ) {
 
     private var currentConfig = featureFlagRepo.getFeatureConfiguration(Feature.CandyBar)

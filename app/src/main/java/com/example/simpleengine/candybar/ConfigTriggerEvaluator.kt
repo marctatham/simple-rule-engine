@@ -2,7 +2,7 @@ package com.example.simpleengine.candybar
 
 import com.example.simpleengine.experimentation.CandyBarConfig
 
-class ConfigRuleEvaluator {
+class ConfigTriggerEvaluator {
 
     fun evalRules(config: CandyBarConfig): List<CandyBarTriggers> {
         val triggers = mutableListOf<CandyBarTriggers>()

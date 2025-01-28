@@ -2,7 +2,7 @@ package com.example.simpleengine
 
 import com.example.simpleengine.candybar.CandyBarManager
 import com.example.simpleengine.candybar.CandyBarRuleEngine
-import com.example.simpleengine.candybar.ConfigRuleEvaluator
+import com.example.simpleengine.candybar.ConfigTriggerEvaluator
 import com.example.simpleengine.candybar.TriggerEvaluator
 import com.example.simpleengine.candybar.media.MediaStateStore
 import com.example.simpleengine.candybar.media.MediaTracker
@@ -86,7 +86,7 @@ val candyBarManager = CandyBarManager(
     featureFlagRepo = featureFlagRepo,
     scope = scope,
     triggerEvaluator = TriggerEvaluator(),
-    ruleEvaluator = ConfigRuleEvaluator()
+    ruleEvaluator = ConfigTriggerEvaluator()
 )
 
 // endregion CandyBar Dependencies
