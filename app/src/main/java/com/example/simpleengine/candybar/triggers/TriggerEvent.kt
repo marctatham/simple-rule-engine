@@ -2,7 +2,7 @@ package com.example.simpleengine.candybar.triggers
 
 sealed class TriggerEvent {
 
-    class AppVisitEvent(val visitCount: Int) : TriggerEvent()
+    data object AppVisitEvent : TriggerEvent()
 
     class AppVisitDurationEvent(val durationInMinutes: Int) : TriggerEvent()
 
