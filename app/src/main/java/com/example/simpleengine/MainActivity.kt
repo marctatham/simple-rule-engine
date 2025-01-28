@@ -212,13 +212,12 @@ fun AppScreen() {
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold
             )
+            Result(candyBarDecision)
             Stat("Campaign:", campaign.title)
             Stat("Modals:", "$isModalVisible")
             Stat("Media:", "$isMediaPlaying")
             Stat("Screen:", currentScreen)
             Stat("Events:", "${events.map { it.toDisplayName() +"\n"}}")
-
-            Result(candyBarDecision)
         }
 
     }
