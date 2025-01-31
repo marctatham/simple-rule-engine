@@ -7,11 +7,11 @@ class TriggerEvaluator(
     private val appVisitStore: AppVisitsStore // mocked, for illustrative purposes
 ) {
 
-    fun evaluate(rules: List<CandyBarTriggers>, events: List<TriggerEvent>): List<ResolvedTrigger> {
+    fun evaluate(rules: List<CandyBarTriggerConditions>, events: List<TriggerEvent>): List<ResolvedTrigger> {
         val resolvedTriggers = rules.map {
             when (it) {
-                is CandyBarTriggers.VisitCount -> evaluateAppVisitTrigger(it, events)
-                is CandyBarTriggers.VisitDuration -> evaluateAppDurationTrigger(it, events)
+                is CandyBarTriggerConditions.VisitCount -> evaluateAppVisitTrigger(it, events)
+                is CandyBarTriggerConditions.VisitDuration -> evaluateAppDurationTrigger(it, events)
             }
         }
 
@@ -19,7 +19,7 @@ class TriggerEvaluator(
     }
 
     private fun evaluateAppVisitTrigger(
-        rule: CandyBarTriggers.VisitCount,
+        rule: CandyBarTriggerConditions.VisitCount,
         events: List<TriggerEvent>
     ): ResolvedTrigger {
         val event: TriggerEvent.AppVisitEvent? =
@@ -41,7 +41,7 @@ class TriggerEvaluator(
     }
 
     private fun evaluateAppDurationTrigger(
-        rule: CandyBarTriggers.VisitDuration,
+        rule: CandyBarTriggerConditions.VisitDuration,
         events: List<TriggerEvent>
     ): ResolvedTrigger {
         val event =

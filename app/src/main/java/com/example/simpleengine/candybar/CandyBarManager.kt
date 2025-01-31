@@ -32,7 +32,7 @@ class CandyBarManager(
     private val scope: CoroutineScope, // define what thread it runs on, etc.
 
     private val triggerEvaluator: TriggerEvaluator,
-    private val ruleEvaluator: CandyBarTriggerEvaluator,
+    private val ruleEvaluator: CandyBarTriggerConditionEvaluator,
 ) {
 
     // initialise from the dataStore
@@ -71,7 +71,7 @@ class CandyBarManager(
             // TODO: maybe we can make this just another action that happens on the chain of events
             currentConfig = config
 
-            val rules = ruleEvaluator.evalRules(config)
+            val rules = ruleEvaluator.evaluateTriggerConditions(config)
             val resolvedTriggers = triggerEvaluator.evaluate(rules, events)
 
             candyBarRuleEngine.evaluate(
