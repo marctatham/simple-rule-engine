@@ -32,7 +32,7 @@ class CandyBarManager(
     private val scope: CoroutineScope, // define what thread it runs on, etc.
 
     private val triggerEvaluator: TriggerEvaluator,
-    private val ruleEvaluator: ConfigTriggerEvaluator,
+    private val ruleEvaluator: CandyBarTriggerEvaluator,
 ) {
 
     // initialise from the dataStore
