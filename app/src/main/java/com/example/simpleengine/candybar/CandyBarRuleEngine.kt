@@ -17,8 +17,6 @@ class CandyBarRuleEngine {
         currentScreen: String,
         isMediaPlaying: Boolean,
         isModalVisible: Boolean,
-        // TODO: daysSinceLastShown: ? 3 let's come back to this
-        // TODO: daysSinceLastVisit: ? 2
     ): CandyBarDecision {
 
         // let's do the easy part, short-circuit for any deal-breaker scenarios

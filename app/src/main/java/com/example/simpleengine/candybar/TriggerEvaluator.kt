@@ -22,15 +22,11 @@ class TriggerEvaluator(
         rule: CandyBarTriggerConditions.VisitCount,
         events: List<TriggerEvent>
     ): ResolvedTrigger {
-        val event: TriggerEvent.AppVisitEvent? =
-            events.firstOrNull { it is TriggerEvent.AppVisitEvent } as? TriggerEvent.AppVisitEvent
-        // TODO: might be a good idea to showcase behaviour between Trigger & AppVisit Store
-        // like how maybe all we get is a triggerEvent.NewVisit with no additional data, and
-        // that results in an increment in the store and returning out the current visit count since
-        return event?.let {
+        val appVisitEvent = events.firstOrNull { it is TriggerEvent.AppVisitEvent } as? TriggerEvent.AppVisitEvent
+        return appVisitEvent?.let {
             ResolvedTrigger(
                 rule = rule,
-                trigger = event,
+                trigger = appVisitEvent,
                 isConditionMet = appVisitStore.visitCount >= rule.requiredVisitCount,
             )
         } ?: ResolvedTrigger(
